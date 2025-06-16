@@ -1,9 +1,4 @@
-// document.getElementById("lefteye").style.backgroundColor = "red";
-// document.getElementById("head").style.transform = "rotate( 0deg)";
 
-// document.getElementById("mouth").style.backgroundColor = "plum"
-
-// document.getElementById("rightarm").style.left = "22%"
 
 var rightEye = document.getElementById("righteye");
 var leftEye = document.getElementById("lefteye");

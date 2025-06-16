@@ -3,113 +3,91 @@ var trainPosition = 0;
 var animation;
 
 var train = document.getElementById("train");
-train.addEventListener("click", speedUp);
-
+var smoke = document.getElementById("smoke");
+var speedDisplay = document.getElementById("speedDisplay");
 var stopButton = document.getElementById("stopButton");
+var restartButton = document.getElementById("restartButton");
+
+var movingSound = document.getElementById("whistle");
+var crashSound = document.getElementById("crash");
+
+train.addEventListener("click", speedUp);
 stopButton.addEventListener("click", stopTrain);
+restartButton.addEventListener("click", resetTrain);
 
 function speedUp() {
     if (trainSpeed > 10) {
         trainSpeed -= 10;
     }
-    console.log("train speed: " + trainSpeed);
+
+    speedDisplay.innerText = "Speed: " + trainSpeed + "ms";
 
     clearInterval(animation);
     animation = setInterval(frame, trainSpeed);
 
+    playSound();
 
-    function frame() {
-        trainPosition += 2;
-        train.style.left = trainPosition + 'px';
-        console.log(trainPosition);
-        checkPosition(trainPosition);
+    // Puff of smoke
+    smoke.style.opacity = 1;
+    smoke.style.left = (trainPosition + 40) + "px";
+    smoke.innerText = "💨";
+    setTimeout(() => smoke.style.opacity = 0, 300);
+}
+
+function frame() {
+    trainPosition += 2;
+    train.style.left = trainPosition + "px";
+
+    if (trainPosition >= window.innerWidth - 100) {
+        crash();
     }
 }
 
-function checkPosition(currentPosition) {
+function crash() {
+    alert("💥 CRASH! 🚆");
+    train.classList.add("shake");
+    crashSound.play();
+    stopSound();
+    clearInterval(animation);
 
-    if (currentPosition >= 418) {
-        alert("OOOOF!");
-        console.log("Crash!");
-        clearInterval(animation);
-        resetTrain();
-    }
+    setTimeout(() => {
+        train.classList.remove("shake");
+    }, 1200);
 }
 
 function stopTrain() {
-    if (trainPosition < 418) {
-        clearInterval(animation);
-    }
+    clearInterval(animation);
+    stopSound();
 }
 
 function resetTrain() {
     trainSpeed = 250;
     trainPosition = 0;
-    train.style.left = '0px';
+    train.style.left = "0px";
+    speedDisplay.innerText = "Speed: 250ms";
+    stopSound();
 }
 
-// function greet(name, surNme) {
-//     console.log("Hello" + name + surNme);
-// };
+function playSound() {
+    movingSound.loop = true;
+    movingSound.volume = 0.3;
+    if (movingSound.paused) {
+        movingSound.play();
+    }
+}
 
-// // greet(" Kelly", " Keet");
+function stopSound() {
+    movingSound.pause();
+    movingSound.currentTime = 0;
+}
 
-// function addition(x, y) {
-//     console.log(x * y)
-// }
-// addition(3, 4)
-
-// var trainSpeed = 250;
-// var trainPosition = 0;
-// var animation;
-
-// var train = document.getElementById("train");
-// train.addEventListener("click", speedUp);
-
-// var stopButton = document.getElementById("stopButton");
-// stopButton.addEventListener("click", stopTrain);
-
-// function speedUp() {
-//     if (trainSpeed > 10) {
-//         trainSpeed -= 10; // Speed up the train
-//     }
-
-//     console.log("Train speed: " + trainSpeed);
-
-//     clearInterval(animation); // Stop old animation
-//     animation = setInterval(frame, trainSpeed); // Restart with new speed
-// }
-
-// function frame() {
-//     trainPosition += 2;
-//     train.style.left = trainPosition + "px";
-//     console.log(trainPosition);
-//     checkPosition(trainPosition);
-// }
-
-// function checkPosition(currentPosition) {
-//     if (currentPosition >= 408) {
-//         alert("OOOOO! Crash! 🚆💥");
-
-//         clearInterval(animation); // Stop the train
-
-//         // Restart after a short delay
-//         setTimeout(restartTrain, 1000); // Wait 1 second, then restart
-//     }
-// }
-
-// function restartTrain() {
-//     trainPosition = 0; // Reset train position
-//     train.style.left = "0px"; // Move train back to start
-//     trainSpeed = 250; // Reset speed
-
-//     console.log("Restarting train...");
-
-//     // Restart animation
-//     animation = setInterval(frame, trainSpeed);
-// }
-
-// // Stop function (if needed)
-// function stopTrain() {
-//     clearInterval(animation);
-// }
+document.addEventListener("keydown", function (event) {
+    const key = event.key.toLowerCase();
+    if (key === "arrowright" || key === "d") {
+        speedUp();
+    } else if (key === "arrowleft" || key === "a") {
+        stopTrain();
+    } else if (key === "r") {
+        resetTrain();
+    }
+});
